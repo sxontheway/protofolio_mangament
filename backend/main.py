@@ -237,38 +237,19 @@ def export_data():
 def import_data(data: dict, strategy: str = "current"):
     """
     Import portfolio data with strategy:
-    - 'current': Backup existing current -> Replace current with imported -> Keep existing history.
-    - 'full': Completely replace all data (current + history) with imported data.
+    - 'current': Replace current holdings with imported data. Does NOT create snapshot or modify history.
+    - 'full': Completely replace all data (current holdings + history snapshots) with imported data.
     """
     import traceback
     try:
         if strategy == "full":
-            # Full Overwrite
+            # Full Overwrite: Replace everything
             data_manager.data = data
             data_manager._save_data()
-            return {"status": "success", "message": "Full import completed. History overwritten."}
+            return {"status": "success", "message": "Full import completed. All data replaced."}
         
         else: # strategy == 'current' (Default)
-            # 1. Auto-backup current holdings if they exist
-            current_holdings = data_manager.get_holdings()
-            if current_holdings:
-                try:
-                    # Try to calculate current net worth for the snapshot
-                    summary = get_portfolio_summary()
-                    net_worth = summary.total_net_worth_hkd
-                except Exception as e:
-                    print(f"Error calculating net worth for backup: {e}")
-                    net_worth = 0.0 # Fallback if calculation fails
-                
-                backup_snapshot = PortfolioSnapshot(
-                    date=date.today(),
-                    total_net_worth_hkd=net_worth,
-                    holdings_snapshot=[h.dict() for h in current_holdings],
-                    id=f"backup_{int(datetime.now().timestamp())}"
-                )
-                data_manager.save_snapshot(backup_snapshot)
-            
-            # 2. Load imported holdings as current
+            # Update Current Holdings Only: Do NOT touch snapshots
             if "holdings" in data:
                 new_holdings = []
                 for h in data["holdings"]:
@@ -277,11 +258,11 @@ def import_data(data: dict, strategy: str = "current"):
                     except Exception as e:
                         print(f"Skipping invalid holding: {e}")
                 data_manager.data["holdings"] = [h.dict() for h in new_holdings]
+                print(f"Imported {len(new_holdings)} holdings as current")
             
-            # 3. Do NOT touch existing snapshots (keep history)
-            
+            # Do NOT create backup snapshot, do NOT modify existing snapshots
             data_manager._save_data()
-            return {"status": "success", "message": "Current holdings imported. Previous holdings backed up to history."}
+            return {"status": "success", "message": "Current holdings updated. Use 'Update Snapshot' button to save to history."}
     except Exception as e:
         print(f"CRITICAL IMPORT ERROR: {e}")
         traceback.print_exc()

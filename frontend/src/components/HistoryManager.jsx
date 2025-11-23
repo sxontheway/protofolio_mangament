@@ -55,7 +55,7 @@ export default function HistoryManager({ history, onRefresh, onClose, setLoading
                         </tr>
                     </thead>
                     <tbody>
-                        {history.map(h => (
+                        {[...history].reverse().map(h => (
                             <tr key={h.id || h.date}>
                                 <td>{h.date}</td>
                                 <td>{h.total_net_worth_hkd?.toLocaleString()}</td>

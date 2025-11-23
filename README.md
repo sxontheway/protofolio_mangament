@@ -75,18 +75,20 @@ Access the application at: `http://localhost:3000`
    - *Note*: For "Sell Put" options, select "Short" side; the system handles negative quantity logic.
 5. (Optional) Leave **Company Name** and **Sector** blank to auto-fetch them.
 
-### Updating Snapshots
-- Click **"Update Snapshot"** (更新快照) whenever you want to save your current portfolio state.
-- This creates a data point in the "Net Worth History" chart.
+### Saving to History (Creating Snapshots)
+- Click **"Update Snapshot (Add to Chart)"** (更新快照) to **save the current holdings state** to history.
+- This creates a new data point in the **"Net Worth History" chart**.
+- **Important**: Only this button adds points to the chart. Importing data does NOT automatically create snapshots.
 
 ### Viewing History
-1. Use the dropdown menu at the top left (default: "📊 Current Holdings").
-2. Select a past date to view the portfolio state (Holdings & Charts) at that time.
-3. Historical views are **Read-Only**.
+1. Click **"History"** button to view all saved snapshots.
+2. Click **"View"** on any snapshot to see the portfolio state at that time (read-only).
+3. Click **"← Back to Current"** to return to editing mode.
 
-### Data Backup
-- **Export**: Click "Export" to download `portfolio_data.json`.
-- **Import**: Click "Import" to restore data from a JSON file.
+### Data Backup & Import
+- **Export**: Click "Export" to download `portfolio_data.json` (includes current holdings + all history).
+- **Import - Update Current Holdings**: Replaces current holdings only. **Does NOT modify history chart**. Use this to restore a backup or update your working data.
+- **Import - Full Overwrite**: ⚠️ Deletes everything and replaces with imported file (use with caution).
 
 ---
 

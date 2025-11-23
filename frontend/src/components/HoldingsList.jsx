@@ -7,6 +7,7 @@ export default function HoldingsList({ holdings, onEdit, onRefresh, lang = 'en',
             edit: '编辑',
             delete: '删除',
             confirmDelete: '确定要删除这个资产吗？',
+            confirmDeleteAll: '⚠️ 警告：确定要删除所有持仓吗？此操作不可撤销！',
             holdings: '持仓明细',
             ticker: '代码',
             company: '公司名',
@@ -28,12 +29,14 @@ export default function HoldingsList({ holdings, onEdit, onRefresh, lang = 'en',
             put: '看跌',
             call: '看涨',
             addAsset: '添加资产',
-            updateSnapshot: '更新快照'
+            updateSnapshot: '添加快照',
+            deleteAll: '清空所有'
         },
         en: {
             edit: 'Edit',
             delete: 'Delete',
             confirmDelete: 'Are you sure you want to delete this asset?',
+            confirmDeleteAll: '⚠️ Warning: Delete ALL holdings? This action cannot be undone!',
             holdings: 'Holdings',
             ticker: 'Ticker',
             company: 'Company',
@@ -55,7 +58,8 @@ export default function HoldingsList({ holdings, onEdit, onRefresh, lang = 'en',
             put: 'Put',
             call: 'Call',
             addAsset: 'Add Asset',
-            updateSnapshot: 'Update Snapshot'
+            updateSnapshot: 'Add Snapshot',
+            deleteAll: 'Delete All'
         }
     };
 
@@ -66,14 +70,25 @@ export default function HoldingsList({ holdings, onEdit, onRefresh, lang = 'en',
         }
     };
 
+    const handleDeleteAll = async () => {
+        if (window.confirm(t[lang].confirmDeleteAll)) {
+            // Delete all holdings one by one
+            for (const holding of holdings) {
+                await api.deleteHolding(holding.id);
+            }
+            onRefresh();
+        }
+    };
+
     return (
         <div className="card">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl" style={{ fontSize: '1.5rem', margin: 0 }}>{t[lang].holdings}</h3>
                 {!readOnly && (
                     <div className="flex gap-2">
-                        <button onClick={onUpdateSnapshot} className="btn" style={{ fontSize: '0.9rem', marginRight: '0.5rem' }}>{t[lang].updateSnapshot}</button>
-                        <button onClick={onAddAsset} className="btn" style={{ fontSize: '0.9rem', background: '#22c55e' }}>{t[lang].addAsset}</button>
+                        <button onClick={handleDeleteAll} className="btn" style={{ fontSize: '0.9rem', background: '#ef4444', marginRight: '0.5rem' }}>{t[lang].deleteAll}</button>
+                        <button onClick={onAddAsset} className="btn" style={{ fontSize: '0.9rem', background: '#22c55e', marginRight: '0.5rem' }}>{t[lang].addAsset}</button>
+                        <button onClick={onUpdateSnapshot} className="btn" style={{ fontSize: '0.9rem' }}>{t[lang].updateSnapshot}</button>
                     </div>
                 )}
             </div>

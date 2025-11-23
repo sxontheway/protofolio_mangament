@@ -88,7 +88,7 @@ export default function Dashboard() {
         },
         en: {
             title: 'Portfolio Dashboard',
-            netWorth: 'Net Worth',
+            netWorth: 'Current Net Worth',
             export: 'Export',
             import: 'Import',
             history: 'History',
@@ -250,8 +250,8 @@ export default function Dashboard() {
                                     </div>
                                     <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.4' }}>
                                         {lang === 'zh'
-                                            ? '推荐。保留所有历史记录。旧的当前持仓将自动备份为历史快照。'
-                                            : 'Recommended. Keeps all history. Existing holdings will be auto-backed up as a snapshot.'}
+                                            ? '推荐。仅替换当前编辑的持仓数据。之后手动点击"更新快照"可添加新节点到历史曲线。'
+                                            : 'Recommended. Only replaces current holdings. Click "Update Snapshot" later to add new data point to history chart.'}
                                     </div>
                                 </div>
                             </button>
@@ -279,8 +279,8 @@ export default function Dashboard() {
                                     </div>
                                     <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.4' }}>
                                         {lang === 'zh'
-                                            ? '危险。清空所有现有数据（包括历史记录），完全替换为导入文件的数据。'
-                                            : 'Danger. Clears ALL existing data including history. Replaces everything with imported data.'}
+                                            ? '危险。清空所有现有数据（包括历史曲线），完全替换为导入文件的数据。'
+                                            : 'Danger. Clears ALL existing data including history chart. Replaces everything with imported data.'}
                                     </div>
                                 </div>
                             </button>
@@ -308,21 +308,6 @@ export default function Dashboard() {
             <div className="header">
                 <div>
                     <h1 className="text-xl" style={{ fontSize: '2.2rem', margin: 0 }}>{t[lang].title}</h1>
-                    <p className="text-gray" style={{ fontSize: '1.1rem' }}>
-                        {t[lang].netWorth}: <span style={{ color: '#38bdf8', fontSize: '1.8rem' }}>HKD {displayData.netWorth?.toLocaleString()}</span>
-                        {selectedSnapshot && (
-                            <span style={{ color: '#eab308', fontSize: '1rem', marginLeft: '1rem' }}>
-                                ({selectedSnapshot.date})
-                                <button
-                                    onClick={() => setSelectedSnapshot(null)}
-                                    className="btn"
-                                    style={{ marginLeft: '1rem', padding: '0.2rem 0.5rem', fontSize: '0.8rem', background: '#334155' }}
-                                >
-                                    {t[lang].backToCurrent}
-                                </button>
-                            </span>
-                        )}
-                    </p>
                 </div>
                 <div className="flex">
                     <button onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')} className="btn" style={{ marginRight: '0.5rem', background: '#64748b' }}>{lang === 'zh' ? 'EN' : '中文'}</button>
@@ -360,6 +345,90 @@ export default function Dashboard() {
                 </div>
             )}
 
+            {/* History Chart Section */}
+            <div className="grid grid-cols-1 mb-4">
+                <div className="card">
+                    <HistoryChart data={history} lang={lang} />
+                </div>
+            </div>
+
+            {/* Visual Divider with Section Title */}
+            <div style={{
+                margin: '2.5rem 0 1.5rem 0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+            }}>
+                <div style={{
+                    flex: 1,
+                    height: '2px',
+                    background: 'linear-gradient(to right, transparent, #38bdf8, transparent)',
+                    opacity: 0.5
+                }}></div>
+                <div style={{
+                    fontSize: '1.2rem',
+                    fontWeight: '600',
+                    color: '#38bdf8',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em'
+                }}>
+                    {lang === 'zh' ? '📊 当前持仓分析' : '📊 Current Holdings Analysis'}
+                    {selectedSnapshot && (
+                        <span style={{
+                            fontSize: '0.8rem',
+                            color: '#eab308',
+                            marginLeft: '0.5rem',
+                            fontWeight: 'normal',
+                            textTransform: 'none',
+                            letterSpacing: 'normal'
+                        }}>
+                            ({selectedSnapshot.date})
+                        </span>
+                    )}
+                </div>
+                <div style={{
+                    flex: 1,
+                    height: '2px',
+                    background: 'linear-gradient(to right, transparent, #38bdf8, transparent)',
+                    opacity: 0.5,
+                    transform: 'scaleX(-1)'
+                }}></div>
+            </div>
+
+            {/* Net Worth Display */}
+            <div style={{
+                textAlign: 'center',
+                marginBottom: '2rem',
+                padding: '1.5rem',
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(34, 197, 94, 0.1))',
+                borderRadius: '8px',
+                border: '1px solid rgba(56, 189, 248, 0.2)'
+            }}>
+                <div style={{ fontSize: '1rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
+                    {t[lang].netWorth}
+                </div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#38bdf8' }}>
+                    HKD {displayData.netWorth?.toLocaleString()}
+                </div>
+                {selectedSnapshot && (
+                    <button
+                        onClick={() => setSelectedSnapshot(null)}
+                        className="btn"
+                        style={{
+                            marginTop: '1rem',
+                            padding: '0.5rem 1.2rem',
+                            fontSize: '0.95rem',
+                            background: '#334155',
+                            border: '1px solid #38bdf8',
+                            fontWeight: '500'
+                        }}
+                    >
+                        ← {t[lang].backToCurrent}
+                    </button>
+                )}
+            </div>
+
+            {/* Pie Charts Section (Linked with Holdings below) */}
             <div className="grid grid-cols-3 mb-4">
                 <div className="card">
                     <MarketPie data={displayData.marketDist} lang={lang} />
@@ -372,12 +441,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 mb-4">
-                <div className="card">
-                    <HistoryChart data={history} lang={lang} />
-                </div>
-            </div>
-
+            {/* Holdings List (Linked with Pie Charts above) */}
             <HoldingsList
                 holdings={displayData.holdings}
                 onEdit={selectedSnapshot ? null : handleEdit}

@@ -2,6 +2,8 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 
+import requests
+
 # Cache to avoid hitting API too frequently
 _PRICE_CACHE = {}
 _FX_CACHE = {}
@@ -13,52 +15,90 @@ class MarketData:
 
     def get_ticker_symbol(self, ticker, market):
         """
-        Convert user ticker to yfinance format.
-        US: AAPL -> AAPL
-        HK: 0700 -> 0700.HK
-        CN: 600519 -> 600519.SS (Shanghai) or .SZ (Shenzhen). 
-            This is tricky, might need user to specify or try both.
-            For simplicity, let's assume user inputs full suffix for CN or we try to guess.
-            Let's assume user inputs: 0700.HK, AAPL, 600519.SS
+        Convert user ticker to Sina/yfinance format.
+        Sina Format:
+        US: gb_aapl (lowercase)
+        HK: hk00700
+        CN: sh600519, sz000001
         """
-        # If user already provided suffix, trust it.
-        if "." in ticker:
-            return ticker.upper()
-        
-        if market == "HK":
-            return f"{ticker}.HK"
+        ticker = ticker.lower()
+        if market == "US":
+            return f"gb_{ticker}"
+        elif market == "HK":
+            # Sina expects hk00700
+            return f"hk{ticker}"
         elif market == "CN":
-            # Default to SS if not specified? Or maybe try both?
-            # Let's assume user inputs raw code for CN, we default to SS for 60xxxx, SZ for 00xxxx/30xxxx
+            # Sina expects sh600519 or sz000001
             if ticker.startswith("6"):
-                return f"{ticker}.SS"
+                return f"sh{ticker}"
             else:
-                return f"{ticker}.SZ"
+                return f"sz{ticker}"
+        return ticker
+
+    def get_yfinance_symbol(self, ticker, market):
+        """Legacy yfinance symbol format"""
+        if market == "HK":
+            return f"{ticker}.HK".upper()
+        elif market == "CN":
+            if ticker.startswith("6"):
+                return f"{ticker}.SS".upper()
+            else:
+                return f"{ticker}.SZ".upper()
         return ticker.upper()
 
     def get_current_price(self, ticker, market):
-        symbol = self.get_ticker_symbol(ticker, market)
-        if symbol in _PRICE_CACHE:
-            # Simple in-memory cache for now, valid for this session or short time
-            # For a real app, check timestamp
-            pass
-
+        # Try Sina First (No VPN needed, fast)
+        sina_symbol = self.get_ticker_symbol(ticker, market)
+        price = self.get_price_sina(sina_symbol)
+        if price > 0:
+            return price
+            
+        # Fallback to yfinance
+        print(f"Sina failed for {ticker}, falling back to yfinance...")
+        yf_symbol = self.get_yfinance_symbol(ticker, market)
+        
         try:
-            t = yf.Ticker(symbol)
-            # fast_info is faster than history
+            t = yf.Ticker(yf_symbol)
             price = t.fast_info.last_price
             if price is None:
-                 # Fallback
                  hist = t.history(period="1d")
                  if not hist.empty:
                      price = hist["Close"].iloc[-1]
-            return price
+            return price if price else 0.0
         except Exception as e:
-            print(f"Error fetching price for {symbol}: {e}")
+            print(f"Error fetching price for {yf_symbol}: {e}")
             return 0.0
 
+    def get_price_sina(self, symbol):
+        try:
+            url = f"http://hq.sinajs.cn/list={symbol}"
+            headers = {"Referer": "http://finance.sina.com.cn"}
+            resp = requests.get(url, headers=headers, timeout=3)
+            if resp.status_code == 200:
+                # Format: var hq_str_gb_aapl="Apple Inc,230.00,..."
+                content = resp.text
+                if '="' in content:
+                    data = content.split('="')[1].strip('";\n')
+                    if not data: return 0.0
+                    parts = data.split(',')
+                    
+                    # Parsing logic depends on market
+                    if symbol.startswith("gb_"): # US
+                        # parts[1] is current price
+                        return float(parts[1])
+                    elif symbol.startswith("hk"): # HK
+                        # parts[6] is last close price
+                        return float(parts[6])
+                    elif symbol.startswith("sh") or symbol.startswith("sz"): # CN
+                        # parts[3] is current price
+                        return float(parts[3])
+        except Exception as e:
+            print(f"Sina API error for {symbol}: {e}")
+        return 0.0
+
     def get_sector(self, ticker, market):
-        symbol = self.get_ticker_symbol(ticker, market)
+        # Sector still relies on yfinance as Sina doesn't provide structured metadata easily
+        symbol = self.get_yfinance_symbol(ticker, market)
         if symbol in _SECTOR_CACHE:
             return _SECTOR_CACHE[symbol]
         
@@ -71,7 +111,7 @@ class MarketData:
             return "Unknown"
 
     def get_company_name(self, ticker, market):
-        symbol = self.get_ticker_symbol(ticker, market)
+        symbol = self.get_yfinance_symbol(ticker, market)
         try:
             t = yf.Ticker(symbol)
             # Try shortName first, then longName

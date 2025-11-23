@@ -150,7 +150,7 @@ Click **"Import"** and select a JSON file. You'll see two options:
 ### Backend
 - **FastAPI** - High-performance Python web framework
 - **Pydantic** - Data validation
-- **yfinance** - Yahoo Finance API for market data
+- **Tencent Finance API** - Real-time stock prices for US/HK/CN markets (no VPN required)
 - **uvicorn** - ASGI server
 
 ### Data Storage

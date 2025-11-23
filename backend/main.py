@@ -67,6 +67,9 @@ def get_portfolio_summary():
             fx = market_data.get_fx_rate(currency)
             market_val_hkd = h.quantity * fx
             
+            # Accumulate to total net worth
+            total_net_worth_hkd += market_val_hkd
+            
             # Distribution
             market_dist["Cash"] += market_val_hkd
             
@@ -88,7 +91,7 @@ def get_portfolio_summary():
             elif h.market == "CN": currency = "CNY"
             fx = market_data.get_fx_rate(currency)
             
-            # Handle None values from yfinance
+            # Handle None values from API
             if price is None:
                 price = 0.0
                 print(f"Warning: Could not fetch price for {h.ticker} ({h.market})")

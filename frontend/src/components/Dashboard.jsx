@@ -331,8 +331,7 @@ export default function Dashboard() {
             )}
 
             <div className="header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '8px' }} />
+                <div>
                     <h1 className="text-xl" style={{ fontSize: '2.2rem', margin: 0 }}>{t[lang].title}</h1>
                 </div>
                 <div className="flex">

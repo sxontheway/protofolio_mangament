@@ -1,4 +1,10 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+import sys
+import webbrowser
+import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from datetime import date, datetime
@@ -286,3 +292,28 @@ def import_data(data: dict, strategy: str = "current"):
         print(f"CRITICAL IMPORT ERROR: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+# Serve React App (for standalone/production)
+# Determine path to frontend/dist
+if getattr(sys, 'frozen', False):
+    # Running in a bundle
+    base_dir = sys._MEIPASS
+    frontend_dist = os.path.join(base_dir, "frontend", "dist")
+else:
+    # Running normally
+    frontend_dist = os.path.join(os.path.dirname(__file__), "../frontend/dist")
+
+if os.path.exists(frontend_dist):
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_react_app(full_path: str):
+        # Allow API calls to pass through (if they didn't match specific routes above)
+        # But since specific routes match first, we only need to worry about 404s for APIs
+        # For now, we just serve index.html for everything else to support React Routing
+        return FileResponse(os.path.join(frontend_dist, "index.html"))
+
+if __name__ == "__main__":
+    # Open browser
+    webbrowser.open("http://127.0.0.1:8000")
+    uvicorn.run(app, host="127.0.0.1", port=8000)

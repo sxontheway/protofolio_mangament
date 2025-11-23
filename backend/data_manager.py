@@ -5,11 +5,17 @@ from uuid import uuid4
 from datetime import date
 from .models import Holding, PortfolioSnapshot
 
-DATA_FILE = "portfolio_data.json"
+from pathlib import Path
+
+# Use Documents folder for data storage to avoid App Translocation issues
+docs_dir = Path.home() / "Documents" / "PortfolioManager"
+docs_dir.mkdir(parents=True, exist_ok=True)
+DATA_FILE = str(docs_dir / "portfolio_data.json")
 
 class DataManager:
     def __init__(self):
         self.data_file = DATA_FILE
+        print(f"Data file location: {self.data_file}")
         self._load_data()
 
     def _load_data(self):

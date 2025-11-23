@@ -228,6 +228,25 @@ def delete_history_snapshot(snapshot_id: str):
     data_manager.delete_snapshot(snapshot_id)
     return {"status": "success"}
 
+@app.post("/snapshot/{snapshot_id}/restore")
+def restore_snapshot(snapshot_id: str):
+    """
+    Restore a historical snapshot's holdings to current holdings.
+    Does NOT create a new snapshot - user must manually click 'Add Snapshot' after.
+    """
+    # Find the snapshot
+    history = data_manager.get_history()
+    snapshot = next((s for s in history if s.get('id') == snapshot_id), None)
+    
+    if not snapshot:
+        raise HTTPException(status_code=404, detail="Snapshot not found")
+    
+    # Replace current holdings with snapshot's holdings
+    data_manager.data["holdings"] = snapshot["holdings_snapshot"]
+    data_manager._save_data()
+    
+    return {"status": "success", "message": "Holdings restored from snapshot"}
+
 @app.get("/export")
 def export_data():
     """Export all portfolio data as JSON"""

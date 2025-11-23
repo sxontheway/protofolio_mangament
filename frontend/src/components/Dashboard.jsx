@@ -81,6 +81,9 @@ export default function Dashboard() {
             addAsset: '添加资产',
             confirmImport: '警告：导入将覆盖现有数据。确定吗？',
             backToCurrent: '返回当前持仓',
+            restoreToCurrent: '恢复到当前',
+            confirmRestore: '⚠️ 确定要用此快照替换当前持仓吗？当前未保存的修改将丢失。',
+            restoreSuccess: '持仓已恢复！如需保存到历史，请点击"添加快照"。',
             byMarket: '市场分布',
             bySector: '行业分布',
             byTicker: '个股分布',
@@ -96,6 +99,9 @@ export default function Dashboard() {
             addAsset: 'Add Asset',
             confirmImport: 'Warning: Importing will OVERWRITE all existing data. Are you sure?',
             backToCurrent: 'Back to Current',
+            restoreToCurrent: 'Restore to Current',
+            confirmRestore: '⚠️ Replace current holdings with this snapshot? Unsaved changes will be lost.',
+            restoreSuccess: 'Holdings restored! Click "Add Snapshot" to save to history.',
             byMarket: 'By Market',
             bySector: 'By Sector',
             byTicker: 'By Ticker',
@@ -202,6 +208,25 @@ export default function Dashboard() {
             alert("Import failed");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleRestoreSnapshot = async () => {
+        if (!selectedSnapshot) return;
+
+        if (window.confirm(t[lang].confirmRestore)) {
+            setLoading(true);
+            try {
+                await api.restoreSnapshot(selectedSnapshot.id);
+                await fetchData();
+                setSelectedSnapshot(null);
+                alert(t[lang].restoreSuccess);
+            } catch (err) {
+                console.error("Restore failed", err);
+                alert("Restore failed");
+            } finally {
+                setLoading(false);
+            }
         }
     };
 
@@ -411,20 +436,35 @@ export default function Dashboard() {
                     HKD {displayData.netWorth?.toLocaleString()}
                 </div>
                 {selectedSnapshot && (
-                    <button
-                        onClick={() => setSelectedSnapshot(null)}
-                        className="btn"
-                        style={{
-                            marginTop: '1rem',
-                            padding: '0.5rem 1.2rem',
-                            fontSize: '0.95rem',
-                            background: '#334155',
-                            border: '1px solid #38bdf8',
-                            fontWeight: '500'
-                        }}
-                    >
-                        ← {t[lang].backToCurrent}
-                    </button>
+                    <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+                        <button
+                            onClick={() => setSelectedSnapshot(null)}
+                            className="btn"
+                            style={{
+                                padding: '0.5rem 1.2rem',
+                                fontSize: '0.95rem',
+                                background: '#334155',
+                                border: '1px solid #38bdf8',
+                                fontWeight: '500'
+                            }}
+                        >
+                            ← {t[lang].backToCurrent}
+                        </button>
+                        <button
+                            onClick={handleRestoreSnapshot}
+                            className="btn"
+                            style={{
+                                padding: '0.5rem 1.2rem',
+                                fontSize: '0.95rem',
+                                background: '#1e293b',
+                                border: '1px solid #eab308',
+                                fontWeight: '500',
+                                color: '#eab308'
+                            }}
+                        >
+                            ↻ {t[lang].restoreToCurrent}
+                        </button>
+                    </div>
                 )}
             </div>
 

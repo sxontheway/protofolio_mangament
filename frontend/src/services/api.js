@@ -59,4 +59,10 @@ export const api = {
     });
     return response.json();
   },
+  restoreSnapshot: async (snapshotId) => {
+    const response = await fetch(`${API_BASE_URL}/snapshot/${snapshotId}/restore`, {
+      method: 'POST'
+    });
+    return response.json();
+  },
 };

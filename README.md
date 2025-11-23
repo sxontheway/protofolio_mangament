@@ -20,14 +20,11 @@ A personal investment portfolio tracking application designed to manage and visu
 ### Main Dashboard
 ![Dashboard Overview](docs/images/dashboard_en.png)
 
-**Layout:**
 1. **Net Worth History Chart** - Time-series visualization at the top
 2. **Current Net Worth Display** - Large, centered card showing total value
 3. **Distribution Charts** - Three pie charts (Market / Sector / Ticker)
 4. **Holdings List** - Detailed table with edit/delete actions
 
-### Asset Management
-![Add Asset Form](docs/images/asset_form.png)
 
 ### Historical Data
 ![History Chart with Tooltips](docs/images/history_chart.png)

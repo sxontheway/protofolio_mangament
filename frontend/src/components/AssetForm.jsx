@@ -11,8 +11,8 @@ export default function AssetForm({ onSave, onClose, initialData, lang = 'en' })
             ticker: '代码',
             quantity: '数量',
             costBasis: '成本 (每股)',
-            companyName: '公司名（可选，留空自动获取）',
-            sector: '行业（可选，留空自动获取）',
+            companyName: '公司名',
+            sector: '行业',
             optionType: '期权类型',
             side: '方向',
             strikePrice: '行权价',
@@ -35,8 +35,8 @@ export default function AssetForm({ onSave, onClose, initialData, lang = 'en' })
             ticker: 'Ticker',
             quantity: 'Quantity',
             costBasis: 'Cost Basis (Per Share)',
-            companyName: 'Company Name (optional, auto-fetch if empty)',
-            sector: 'Sector (optional, auto-fetch if empty)',
+            companyName: 'Company Name',
+            sector: 'Sector',
             optionType: 'Option Type',
             side: 'Side',
             strikePrice: 'Strike Price',
@@ -159,7 +159,20 @@ export default function AssetForm({ onSave, onClose, initialData, lang = 'en' })
                         </div>
                         <div>
                             <label className="text-sm text-gray">{t[lang].sector}</label>
-                            <input name="custom_sector" value={formData.custom_sector} onChange={handleChange} placeholder="Technology" />
+                            <select name="custom_sector" value={formData.custom_sector} onChange={handleChange}>
+                                <option value="">--</option>
+                                <option value="信息 & 科技 / IT">信息 & 科技 / IT</option>
+                                <option value="通信 / Comm.">通信 / Comm.</option>
+                                <option value="金融 / Financial">金融 / Financial</option>
+                                <option value="必选消费 / Con. Staples">必选消费 / Con. Staples</option>
+                                <option value="非必选消费 / Con. Disc.">非必选消费 / Con. Disc.</option>
+                                <option value="医疗 / Healthcare">医疗 / Healthcare</option>
+                                <option value="工业 / Industrial">工业 / Industrial</option>
+                                <option value="能源 / Energy">能源 / Energy</option>
+                                <option value="材料 / Materials">材料 / Materials</option>
+                                <option value="房地产 / Real Estate">房地产 / Real Estate</option>
+                                <option value="公用事业 / Utilities">公用事业 / Utilities</option>
+                            </select>
                         </div>
                     </>
                 )}

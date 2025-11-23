@@ -20,7 +20,40 @@ class DataManager:
 
     def _load_data(self):
         if not os.path.exists(self.data_file):
-            self.data = {"holdings": [], "snapshots": []}
+            # Create default demo holdings for new users
+            self.data = {
+                "holdings": [
+                    {
+                        "id": str(uuid4()),
+                        "ticker": "USD",
+                        "market": "US",
+                        "asset_type": "Cash",
+                        "quantity": 10000,
+                        "cost_basis": 1.0,
+                        "company_name": "US Dollar",
+                        "custom_sector": None,
+                        "option_type": None,
+                        "strike_price": None,
+                        "expiry_date": None,
+                        "side": None
+                    },
+                    {
+                        "id": str(uuid4()),
+                        "ticker": "0700",
+                        "market": "HK",
+                        "asset_type": "Stock",
+                        "quantity": 1000,
+                        "cost_basis": 300.0,  # Example cost basis
+                        "company_name": "Tencent Holdings",
+                        "custom_sector": None,
+                        "option_type": None,
+                        "strike_price": None,
+                        "expiry_date": None,
+                        "side": None
+                    }
+                ],
+                "snapshots": []
+            }
             self._save_data()
         else:
             with open(self.data_file, "r") as f:

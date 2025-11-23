@@ -97,7 +97,7 @@ export default function HoldingsList({ holdings, onEdit, onRefresh, lang = 'en',
                     <thead>
                         <tr>
                             <th>{t[lang].ticker}</th>
-                            <th>{t[lang].companyName}</th>
+                            <th>{t[lang].company}</th>
                             <th>{t[lang].market}</th>
                             <th>{t[lang].type}</th>
                             <th>{t[lang].quantity}</th>

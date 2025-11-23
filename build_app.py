@@ -43,6 +43,7 @@ def build():
         "--name", "PortfolioManager",
         "--onefile",
         "--clean",
+        "--icon", "icon.png",  # App icon
         "--add-data", add_data,
         # We might need to handle hidden imports if any (e.g. uvicorn.loops, etc)
         # Usually uvicorn needs --hidden-import

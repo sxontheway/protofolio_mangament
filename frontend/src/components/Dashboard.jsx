@@ -13,7 +13,7 @@ export default function Dashboard() {
     const [showHistory, setShowHistory] = useState(false);
     const [editingAsset, setEditingAsset] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [lang, setLang] = useState('en'); // 'zh' or 'en'
+    const [lang, setLang] = useState('zh'); // 'zh' or 'en'
     const [selectedSnapshot, setSelectedSnapshot] = useState(null); // null = current, or snapshot object
 
     // Calculate distributions from holdings (like backend logic)
@@ -331,7 +331,8 @@ export default function Dashboard() {
             )}
 
             <div className="header">
-                <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '8px' }} />
                     <h1 className="text-xl" style={{ fontSize: '2.2rem', margin: 0 }}>{t[lang].title}</h1>
                 </div>
                 <div className="flex">

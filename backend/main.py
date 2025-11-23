@@ -114,7 +114,10 @@ def get_portfolio_summary():
             # Distributions
             market_dist[h.market] = market_dist.get(h.market, 0) + market_val_hkd
             sector_dist[sector] = sector_dist.get(sector, 0) + market_val_hkd
-            ticker_dist[h.ticker] = ticker_dist.get(h.ticker, 0) + market_val_hkd
+            
+            # For ticker distribution: use company name for CN/HK, ticker code for US
+            ticker_key = h.ticker if h.market == "US" else (company_name or h.ticker)
+            ticker_dist[ticker_key] = ticker_dist.get(ticker_key, 0) + market_val_hkd
             
             # Calculate cost value in HKD for accurate P/L calculation
             cost_value_hkd = h.cost_basis * h.quantity * fx

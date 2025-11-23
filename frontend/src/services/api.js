@@ -48,15 +48,15 @@ export const api = {
     return res.json();
   },
   exportData: async () => {
-    const res = await fetch(`${API_BASE_URL}/export`);
-    return res.json();
+    const response = await fetch(`${API_BASE_URL}/export`);
+    return response.json();
   },
-  importData: async (data) => {
-    const res = await fetch(`${API_BASE_URL}/import`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+  importData: async (data, strategy = 'current') => {
+    const response = await fetch(`${API_BASE_URL}/import?strategy=${strategy}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
     });
-    return res.json();
+    return response.json();
   },
 };

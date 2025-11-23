@@ -1,22 +1,23 @@
 import React from 'react';
 import { api } from '../services/api';
 
-export default function HoldingsList({ holdings, onEdit, onRefresh, lang = 'en', readOnly = false }) {
+export default function HoldingsList({ holdings, onEdit, onRefresh, lang = 'en', readOnly = false, onAddAsset, onUpdateSnapshot }) {
     const t = {
         zh: {
             edit: '编辑',
             delete: '删除',
+            confirmDelete: '确定要删除这个资产吗？',
             holdings: '持仓明细',
             ticker: '代码',
-            companyName: '公司名',
+            company: '公司名',
             market: '市场',
             type: '类型',
             quantity: '数量',
             cost: '成本',
             currentPrice: '现价',
-            marketValue: '市值 (HKD)',
-            profitLoss: '盈亏金额',
-            profitLossPercent: '盈亏比例',
+            marketValue: '市值',
+            profitLoss: '盈亏',
+            profitLossPercent: '盈亏%',
             sector: '行业',
             actions: '操作',
             stock: '股票',
@@ -25,21 +26,24 @@ export default function HoldingsList({ holdings, onEdit, onRefresh, lang = 'en',
             sell: '卖出',
             buy: '买入',
             put: '看跌',
-            call: '看涨'
+            call: '看涨',
+            addAsset: '添加资产',
+            updateSnapshot: '更新快照'
         },
         en: {
             edit: 'Edit',
             delete: 'Delete',
+            confirmDelete: 'Are you sure you want to delete this asset?',
             holdings: 'Holdings',
             ticker: 'Ticker',
-            companyName: 'Company',
+            company: 'Company',
             market: 'Market',
             type: 'Type',
             quantity: 'Quantity',
             cost: 'Cost',
             currentPrice: 'Price',
-            marketValue: 'Value (HKD)',
-            profitLoss: 'P/L Amount',
+            marketValue: 'Value',
+            profitLoss: 'P/L',
             profitLossPercent: 'P/L %',
             sector: 'Sector',
             actions: 'Actions',
@@ -49,20 +53,30 @@ export default function HoldingsList({ holdings, onEdit, onRefresh, lang = 'en',
             sell: 'Sell',
             buy: 'Buy',
             put: 'Put',
-            call: 'Call'
+            call: 'Call',
+            addAsset: 'Add Asset',
+            updateSnapshot: 'Update Snapshot'
         }
     };
 
     const handleDelete = async (id) => {
-        // if (confirm('Are you sure you want to delete this holding?')) {
-        await api.deleteHolding(id);
-        onRefresh();
-        // }
+        if (window.confirm(t[lang].confirmDelete)) {
+            await api.deleteHolding(id);
+            onRefresh();
+        }
     };
 
     return (
         <div className="card">
-            <h3 className="text-xl mb-4" style={{ fontSize: '1.5rem' }}>{t[lang].holdings}</h3>
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl" style={{ fontSize: '1.5rem', margin: 0 }}>{t[lang].holdings}</h3>
+                {!readOnly && (
+                    <div className="flex gap-2">
+                        <button onClick={onUpdateSnapshot} className="btn" style={{ fontSize: '0.9rem', marginRight: '0.5rem' }}>{t[lang].updateSnapshot}</button>
+                        <button onClick={onAddAsset} className="btn" style={{ fontSize: '0.9rem', background: '#22c55e' }}>{t[lang].addAsset}</button>
+                    </div>
+                )}
+            </div>
             <div style={{ overflowX: 'auto' }}>
                 <table>
                     <thead>
